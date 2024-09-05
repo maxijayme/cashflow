@@ -24,7 +24,7 @@
   right: 0;
   top: 0;
   bottom: 0;
-  background-color: white;
+  background-color: rgb(0, 0, 0);
 }
 
 .head {
