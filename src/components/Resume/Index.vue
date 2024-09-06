@@ -61,6 +61,7 @@ h1,
 p {
   margin: 0;
   text-align: center;
+  color: white
 }
 
 h1 {
