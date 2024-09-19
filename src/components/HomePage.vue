@@ -14,7 +14,7 @@
                     <Graphic :amounts="amounts"/>
                 </template>
                 <template #action>
-                    <Action>
+                    <Action @addMovement="addMovement">
                         <slot></slot>
                     </Action>
                 </template>
@@ -23,6 +23,7 @@
         <template #movements>
             <Movements
                 :movements="movements"
+                @remove="removeMovement"
             />
         </template>
     </Layout>
@@ -53,7 +54,7 @@
                     id: 1,
                     title: "Movimiento 1",
                     description: "Deposito de salario",
-                    amount: 1000,
+                    amount: -200,
                     time: new Date("09/02/2024"),
                     },
                     {
@@ -61,7 +62,7 @@
                     title: "Movimiento 2",
                     description: "Deposito de honorarios",
                     amount: 500,
-                    time: new Date("08/21/02024"),
+                    time: new Date("08/21/2024"),
                     },
                     {
                     id: 3,
@@ -74,31 +75,40 @@
                     id: 4,
                     title: "Movimiento 4",
                     description: "Colegiatura",
-                    amount: 1000,
-                    time: new Date("02/08/2024"),
+                    amount: -1000,
+                    time: new Date("08/21/2024"),
                     }
                 ]
             }
         },
         computed: {
             amounts() {
-                const lastDays = this.movements
-                    .filter( movement => {
-                        const today = new Date()
-                        const oldDate = new Date(today.setDate(today.getDate() - 30))
-                        console.log( movement.time)
-                        return movement.time > oldDate
+                const lastDays = this.movements.filter((x) => {
+                    const today = new Date();
+                    const oldDate = today.setDate(today.getDate() - 30);
+
+                    return x.time > oldDate;
                     })
-                    .map( movement => movement.amount )
-                console.log(lastDays)
+                    .map((y) => y.amount);
 
-                return lastDays.map((m, i) => {
-                    const lastMovements = lastDays.slice(0, i)
+                return lastDays.map((x, i) => {
+                    const lastMovements = lastDays.slice(0, i);
 
-                    return lastMovements.reduce((suma, movement) => {
-                        return suma + movement
-                    }, 0);
+                    return (
+                    x +
+                    lastMovements.reduce((suma, movement) => {
+                        return suma + movement;
+                    }, 0)
+                    );
                 });
+            }
+        },
+        methods: {
+            addMovement(movement) {
+                this.movements.push(movement)
+            },
+            removeMovement(id) {
+                this.movements = this.movements.filter(movement => movement.id !== id)
             }
         }
     };

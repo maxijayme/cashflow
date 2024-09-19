@@ -47,13 +47,13 @@
     const {amounts} = toRefs(props)
 
     const amountToPixels = (amount) => {
-    const min = Math.min(...amounts.value);
-    const max = Math.max(...amounts.value);
+        const min = Math.min(...amounts.value);
+        const max = Math.max(...amounts.value);
 
-    const amountAbs = amount + Math.abs(min);
-    const minmax = Math.abs(max) + Math.abs(min);
+        const amountAbs = amount + Math.abs(min);
+        const minmax = Math.abs(max) + Math.abs(min);
 
-    return 200 - ((amountAbs * 100) / minmax) * 2;
+        return 200 - ((amountAbs * 100) / minmax) * 2;
     }
 
     const points = computed(() => {
@@ -62,7 +62,7 @@
             const x = (300 / total) * (i + 1);
             const y = amountToPixels(amount);
             return `${points} ${x},${y}`;
-        }, "0, 100");
+        }, `0, ${zero.value}`)
     });
 
     const zero = computed(() => {

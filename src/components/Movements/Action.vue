@@ -33,14 +33,26 @@
     </teleport>
 </template>
 <script setup>
-import { ref } from 'vue'
+import { ref, defineEmits } from 'vue'
 import Modal from './Modal.vue'
 const showModal = ref(false)
 const title = ref('')
 const amount = ref('0')
 const description = ref('')
 const movementType = ref('Ingreso')
-const submit = () => showModal.value = false
+
+const emit = defineEmits(["addMovement"])
+const submit = () => {
+  showModal.value = false
+  emit("addMovement", {
+        title: title.value,
+        amount: movementType.value === "Ingreso"? amount.value : -amount.value,
+        description: description.value,
+        movementType: movementType.value,
+        time: new Date(),
+        id: new Date().getTime()
+    })
+}
 </script>
 <style scoped>
 button {
@@ -73,6 +85,7 @@ form .action {
 
 label {
   margin-bottom: 8px;
+  color:white;
 }
 
 input,
