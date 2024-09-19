@@ -37,7 +37,7 @@
 </template>
 
 <script setup>
-    import { computed, ref, toRefs, defineProps } from 'vue'
+    import { computed, ref, toRefs, defineProps, defineEmits, watch } from 'vue'
     const props = defineProps({
         amounts: {
             type: Array,
@@ -45,7 +45,6 @@
         }
     })
     const {amounts} = toRefs(props)
-
     const amountToPixels = (amount) => {
         const min = Math.min(...amounts.value);
         const max = Math.max(...amounts.value);
@@ -62,7 +61,7 @@
             const x = (300 / total) * (i + 1);
             const y = amountToPixels(amount);
             return `${points} ${x},${y}`;
-        }, `0, ${zero.value}`)
+        }, `0, ${amounts.value.length > 0 ? amountToPixels(amounts.value[0]) : zero.value}`)
     });
 
     const zero = computed(() => {
@@ -71,7 +70,12 @@
 
     const showPointer = ref(false);
     const pointer = ref(0);
-
+    const emit = defineEmits(['actualMovement', 'pointerOut'])
+    watch(pointer, (value) => {
+        const index = Math.ceil(value / (300 / amounts.value.length))
+        if ( index < 0 || index > amounts.value.length) return;
+        emit('actualMovement', index-1)
+    })
     const tap = ({ target, touches }) => {
         showPointer.value = true;
         const elementWidth = target.getBoundingClientRect().width;
@@ -94,6 +98,7 @@
     
     const untap = () => {
         showPointer.value = false;
+        emit('pointerOut')
     }
 </script>
 

@@ -8,10 +8,14 @@
                 :total-label="'Ahorro total'"
                 :label="label"
                 :amount="amount"
-                :totalAmount= 100000
+                :totalAmount= totalAmount
             >
                 <template #graphic>
-                    <Graphic :amounts="amounts"/>
+                    <Graphic 
+                        :amounts="amounts" 
+                        @actualMovement="selectedMovement"
+                        @pointerOut="resetMovement"
+                    />
                 </template>
                 <template #action>
                     <Action @addMovement="addMovement">
@@ -49,36 +53,15 @@
             return {
                 amount: null,
                 label: null,
-                movements: [
-                    {
-                    id: 1,
-                    title: "Movimiento 1",
-                    description: "Deposito de salario",
-                    amount: -200,
-                    time: new Date("09/02/2024"),
-                    },
-                    {
-                    id: 2,
-                    title: "Movimiento 2",
-                    description: "Deposito de honorarios",
-                    amount: 500,
-                    time: new Date("08/21/2024"),
-                    },
-                    {
-                    id: 3,
-                    title: "Movimiento 3",
-                    description: "Comida",
-                    amount: -100,
-                    time: new Date("08/30/2024"),
-                    },
-                    {
-                    id: 4,
-                    title: "Movimiento 4",
-                    description: "Colegiatura",
-                    amount: -1000,
-                    time: new Date("08/21/2024"),
-                    }
-                ]
+                movements: []
+            }
+        },
+        mounted() {
+            const movements = localStorage.getItem('movements')
+            if (movements) {
+                this.movements = JSON.parse(movements)?.map((x) => {
+                    return {...x, time: new Date(x.time)}
+                })
             }
         },
         computed: {
@@ -86,11 +69,9 @@
                 const lastDays = this.movements.filter((x) => {
                     const today = new Date();
                     const oldDate = today.setDate(today.getDate() - 30);
-
                     return x.time > oldDate;
                     })
                     .map((y) => y.amount);
-
                 return lastDays.map((x, i) => {
                     const lastMovements = lastDays.slice(0, i);
 
@@ -101,14 +82,32 @@
                     }, 0)
                     );
                 });
+            },
+            totalAmount() {
+                return this.movements?.reduce((suma, movement) => {
+                    return suma + movement.amount;
+                }, 0);
             }
         },
         methods: {
             addMovement(movement) {
                 this.movements.push(movement)
+                this.saveMovements()
             },
             removeMovement(id) {
                 this.movements = this.movements.filter(movement => movement.id !== id)
+                this.saveMovements()
+            },
+            saveMovements(){
+                localStorage.setItem('movements', JSON.stringify(this.movements))
+            },
+            selectedMovement(index){
+                this.amount = this.movements[index]?.amount
+                this.label = this.movements[index]?.time.toLocaleDateString()
+            },
+            resetMovement(){
+                this.amount = null
+                this.label = null
             }
         }
     };
